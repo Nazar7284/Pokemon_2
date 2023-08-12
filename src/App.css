@@ -1,0 +1,148 @@
+.footer {
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  border: 0.125rem solid black;
+  margin: 2rem 30rem 0;
+}
+
+.typeSelect {
+  font-size: 1.25rem;
+  margin-top: 1rem;
+  border: 0.3125rem outset black;
+}
+
+.main {
+  display: flex;
+  margin: 2rem 10%;
+}
+
+.listPokemon {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 50%;
+  gap: 2rem;
+}
+
+.card-pokemon {
+  width: 13rem;
+  border: 1px solid black;
+  text-align: center;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  -webkit-transition: all 0.3s ease-in-out;
+  -moz-transition: all 0.3s ease-in-out;
+  -ms-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+}
+
+.card-pokemon:hover {
+  transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  -o-transform: scale(1.1);
+}
+
+.card-pokemon img {
+  width: 10rem;
+  height: 10rem;
+}
+
+.pokemon-types {
+  display: flex;
+  font-size: 20px;
+  text-align: start;
+}
+
+.pokemon-types div {
+  margin: 0.5em 0.5em 0 0;
+  border-radius: 0.3em;
+  padding: 0.3em;
+}
+
+/*
+  text-align: center;
+  margin-top: 2rem;
+  border: 1px solid black;
+*/
+
+.rock {
+  background-color: rgb(148, 81, 81);
+}
+
+.ghost {
+  background-color: rgb(247, 247, 247);
+}
+
+.electric {
+  background-color: rgb(255, 239, 10);
+}
+
+.bug {
+  background-color: #fdc674;
+}
+
+.poison {
+  background-color: #dd86ff;
+}
+
+.normal {
+  background-color: #cecece;
+}
+
+.fairy {
+  background-color: rgba(255, 192, 203, 0.863);
+}
+
+.fire {
+  background-color: #ff5e42;
+}
+
+.grass {
+  background-color: #4eec49;
+}
+
+.water {
+  background-color: #0095ff;
+}
+
+.flying {
+  background-color: #698df0;
+}
+
+.ground {
+  background-color: rgb(136, 143, 136);
+}
+/*12*/
+
+.button-section {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.button-section button {
+  font-size: 1.5rem;
+  background: transparent;
+  padding: 0.625rem;
+  cursor: pointer;
+  border: 5px outset black;
+  transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+}
+
+.button-section button:hover {
+  transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  -o-transform: scale(1.1);
+}
