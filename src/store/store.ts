@@ -1,7 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "redux";
 import MainReducer from "./reducers/MainSlice";
-const rootReducer = combineReducers({ MainReducer });
+import ActiveReducer from "./reducers/ActivePokemon";
+const rootReducer = combineReducers({ MainReducer, ActiveReducer });
 
 export const setupStore = () => {
   return configureStore({

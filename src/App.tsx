@@ -4,17 +4,27 @@ import "./App.css";
 import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { mainSlice } from "./store/reducers/MainSlice";
 import CardPokemon from "./components/CardPokemon";
-
-interface Type {
-  name: string;
-  url: string;
-}
+import { firstLetterBig } from "./utils/utils";
+import ActivePokemon from "./components/InfoPokemon";
+import { Type } from "./models/models";
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
-  const { previousUrl, nextUrl, listPokemon, previousVisible, nextVisible } =
-    useAppSelector((state) => state.MainReducer);
+  const {
+    previousUrl,
+    nextUrl,
+    listPokemon,
+    previousVisible,
+    nextVisible,
+    isTypeView,
+    typeNextUrl,
+    typePreviousUrl,
+    type,
+    offset,
+    totalPokemonsByType,
+  } = useAppSelector((state) => state.MainReducer);
 
   const {
     changePreviousUrl,
@@ -22,6 +32,10 @@ function App() {
     changeListPokemon,
     changeNextVisible,
     changePreviousVisible,
+    changeIsTypeView,
+    changeOffset,
+    changeType,
+    changeTotal,
   } = mainSlice.actions;
 
   const dispatch = useAppDispatch();
@@ -33,12 +47,11 @@ function App() {
       );
       const types: Type[] = dataType.data.results;
       const typeNames: string[] = types.map((type) => {
-        return type.name.charAt(0).toUpperCase() + type.name.slice(1);
+        return firstLetterBig(type.name);
       }); // назви типів
       const selectElem = document.querySelector(".typeSelect") as HTMLElement;
-
-      typeNames.forEach((typeName) => {
-        const option = new Option(typeName, typeName);
+      typeNames.forEach((typeName, index) => {
+        const option = new Option(typeName, types[index].url);
         selectElem.appendChild(option);
       });
     } catch (error) {
@@ -47,14 +60,17 @@ function App() {
   };
 
   const getDataPokemons = async (url?: string) => {
+    setIsLoadingData(true);
+    console.log("data");
+    window.scroll(0, 0);
     if (!isLoading) {
       setIsLoading(true);
       const defaultUrl = "https://pokeapi.co/api/v2/pokemon/?limit=12";
-
       const inputString =
         typeof url === "string" && url.trim() !== "" ? url : defaultUrl;
 
       const dataPokemon = await axios.get(inputString);
+
       dispatch(changeNextUrl(dataPokemon.data.next));
       dispatch(changePreviousUrl(dataPokemon.data.previous));
 
@@ -74,7 +90,7 @@ function App() {
       const requests = Pokemons.map((pokemon: any) =>
         axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
       );
-
+      dispatch(changeListPokemon([]));
       try {
         const responses = await Promise.all(requests);
         const pokemonData = responses.map((response) => response.data);
@@ -85,7 +101,67 @@ function App() {
       }
       setIsLoading(false);
     }
-    window.scrollTo(0, 0);
+    setIsLoadingData(false);
+  };
+
+  const getPokemonByType = async (value?: string, offset: number = 0) => {
+    setIsLoadingData(true);
+    window.scroll(0, 0);
+    dispatch(changeListPokemon([]));
+    dispatch(changeOffset(offset));
+    if (!isLoading) {
+      setIsLoading(true);
+      let inputString: string = "";
+      if (typeof value === "string" && value.trim() !== "") {
+        inputString = value;
+        dispatch(changeIsTypeView(true));
+        dispatch(changeType(type));
+
+        const dataPokemonByType = await axios.get(inputString);
+
+        if (
+          dataPokemonByType.data.pokemon &&
+          dataPokemonByType.data.pokemon.length > 0
+        ) {
+          const PokemonByType = dataPokemonByType.data.pokemon.slice(
+            offset,
+            offset + 12
+          );
+
+          const requests = PokemonByType.map((pokemon: any) =>
+            axios.get(pokemon.pokemon.url)
+          );
+          try {
+            const responses = await Promise.all(requests);
+            const pokemonData = responses.map((response) => response.data);
+            dispatch(changeListPokemon(pokemonData));
+
+            if (offset + 12 >= dataPokemonByType.data.pokemon.length) {
+              dispatch(changeNextVisible(false));
+            } else {
+              dispatch(changeNextVisible(true));
+            }
+            if (offset - 12 < 0) {
+              dispatch(changePreviousVisible(false));
+            } else {
+              dispatch(changePreviousVisible(true));
+            }
+          } catch (error) {
+            console.error("Error fetching pokemon data:", error);
+            return [];
+          }
+        } else {
+          console.log("No Pokemon data found.");
+          dispatch(changeNextVisible(false));
+          dispatch(changePreviousVisible(false));
+        }
+        setIsLoading(false);
+      } else {
+        getDataPokemons();
+        dispatch(changeIsTypeView(false));
+      }
+    }
+    setIsLoadingData(false);
   };
 
   useEffect(() => {
@@ -97,9 +173,12 @@ function App() {
     <div className="header">
       <div className="footer">
         <h1 className="title">Pokedex</h1>
-        <select className="typeSelect">
+        <select
+          onChange={(e) => getPokemonByType(e.target.value)}
+          className="typeSelect"
+        >
           <option disabled>Sort by type</option>
-          <option value="all">All types</option>
+          <option value="">All types</option>
         </select>
       </div>
       <div className="main">
@@ -109,14 +188,16 @@ function App() {
               return (
                 <CardPokemon
                   name={pokemon.name}
-                  photo={pokemon.sprites.other.dream_world["front_default"]}
+                  photo={pokemon.sprites.other.dream_world.front_default}
                   types={pokemon.types}
                   key={pokemon.id}
                 />
               );
             })
+          ) : isLoadingData ? (
+            <div className="lds-dual-ring"></div>
           ) : (
-            <h1>Loading</h1>
+            <h1>No Pokemon data found.</h1>
           )}
           <div className="button-section">
             <button
@@ -124,7 +205,10 @@ function App() {
               disabled={isLoading}
               style={{ display: previousVisible ? "inline-block" : "none" }}
               onClick={() =>
-                previousUrl !== null && getDataPokemons(previousUrl)
+                isTypeView
+                  ? typePreviousUrl !== null &&
+                    getPokemonByType(type, offset - 12)
+                  : previousUrl !== null && getDataPokemons(previousUrl)
               }
             >
               Previous
@@ -133,14 +217,19 @@ function App() {
               className="btn-next"
               disabled={isLoading}
               style={{ display: nextVisible ? "inline-block" : "none" }}
-              onClick={() => nextUrl !== null && getDataPokemons(nextUrl)}
+              onClick={() =>
+                isTypeView
+                  ? typeNextUrl !== null && getPokemonByType(type, offset + 12)
+                  : nextUrl !== null && getDataPokemons(nextUrl)
+              }
             >
               Next
             </button>
           </div>
         </div>
-        <div>Type is {previousUrl}</div>
-        {/* <div className="infoPokemon"></div> */}
+        <div className="infoPokemon">
+          <ActivePokemon />
+        </div>
       </div>
     </div>
   );
