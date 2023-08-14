@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/Pokemon_2/static/css/main.13d61c35.css",
+    "main.css": "/Pokemon_2/static/css/main.cd2f2261.css",
     "main.js": "/Pokemon_2/static/js/main.684c245e.js",
     "index.html": "/Pokemon_2/index.html",
-    "main.13d61c35.css.map": "/Pokemon_2/static/css/main.13d61c35.css.map",
+    "main.cd2f2261.css.map": "/Pokemon_2/static/css/main.cd2f2261.css.map",
     "main.684c245e.js.map": "/Pokemon_2/static/js/main.684c245e.js.map"
   },
   "entrypoints": [
-    "static/css/main.13d61c35.css",
+    "static/css/main.cd2f2261.css",
     "static/js/main.684c245e.js"
   ]
 }
