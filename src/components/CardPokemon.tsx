@@ -39,8 +39,10 @@ function CardPokemon({ name, types, photo }: CardPokemonProps) {
       key={name}
       onClick={() => ActivePokemon(name)}
     >
-      <img src={photo === null ? defaultImage : photo} alt={name} />
-      <h2>{firstLetterBig(name)}</h2>
+      <div>
+        <img src={photo === null ? defaultImage : photo} alt={name} />
+        <h2>{firstLetterBig(name)}</h2>
+      </div>
       <div className="pokemon-types">{typeElements}</div>
     </div>
   );

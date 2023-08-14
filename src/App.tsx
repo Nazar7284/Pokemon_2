@@ -19,11 +19,8 @@ function App() {
     previousVisible,
     nextVisible,
     isTypeView,
-    typeNextUrl,
-    typePreviousUrl,
-    type,
     offset,
-    totalPokemonsByType,
+    currentUrlType,
   } = useAppSelector((state) => state.MainReducer);
 
   const {
@@ -34,8 +31,7 @@ function App() {
     changePreviousVisible,
     changeIsTypeView,
     changeOffset,
-    changeType,
-    changeTotal,
+    changeCurrentUrlType,
   } = mainSlice.actions;
 
   const dispatch = useAppDispatch();
@@ -60,11 +56,11 @@ function App() {
   };
 
   const getDataPokemons = async (url?: string) => {
-    setIsLoadingData(true);
-    console.log("data");
-    window.scroll(0, 0);
+    dispatch(changeIsTypeView(false));
     if (!isLoading) {
       setIsLoading(true);
+      setIsLoadingData(true);
+      window.scroll(0, 0);
       const defaultUrl = "https://pokeapi.co/api/v2/pokemon/?limit=12";
       const inputString =
         typeof url === "string" && url.trim() !== "" ? url : defaultUrl;
@@ -99,26 +95,34 @@ function App() {
         console.error("Error fetching pokemon data:", error);
         return [];
       }
-      setIsLoading(false);
     }
     setIsLoadingData(false);
+    setIsLoading(false);
   };
 
   const getPokemonByType = async (value?: string, offset: number = 0) => {
-    setIsLoadingData(true);
-    window.scroll(0, 0);
-    dispatch(changeListPokemon([]));
-    dispatch(changeOffset(offset));
+    console.log("type");
     if (!isLoading) {
       setIsLoading(true);
-      let inputString: string = "";
-      if (typeof value === "string" && value.trim() !== "") {
-        inputString = value;
-        dispatch(changeIsTypeView(true));
-        dispatch(changeType(type));
+      setIsLoadingData(true);
+      window.scroll(0, 0);
+      dispatch(changeListPokemon([]));
+      dispatch(changeOffset(offset));
 
-        const dataPokemonByType = await axios.get(inputString);
-
+      let currentUrl: string = "";
+      if (value === "all") {
+        getDataPokemons();
+      } else {
+        if (typeof value === "string" && value.trim() !== "") {
+          console.log("перший пошук за типом");
+          dispatch(changeIsTypeView(true));
+          dispatch(changeCurrentUrlType(value));
+          currentUrl = value;
+        } else if (currentUrlType !== "") {
+          console.log("взяли з redux url");
+          currentUrl = currentUrlType;
+        }
+        const dataPokemonByType = await axios.get(currentUrl);
         if (
           dataPokemonByType.data.pokemon &&
           dataPokemonByType.data.pokemon.length > 0
@@ -151,17 +155,15 @@ function App() {
             return [];
           }
         } else {
+          // Немає покемонів
           console.log("No Pokemon data found.");
           dispatch(changeNextVisible(false));
           dispatch(changePreviousVisible(false));
         }
+        setIsLoadingData(false);
         setIsLoading(false);
-      } else {
-        getDataPokemons();
-        dispatch(changeIsTypeView(false));
       }
     }
-    setIsLoadingData(false);
   };
 
   useEffect(() => {
@@ -178,7 +180,7 @@ function App() {
           className="typeSelect"
         >
           <option disabled>Sort by type</option>
-          <option value="">All types</option>
+          <option value="all">All types</option>
         </select>
       </div>
       <div className="main">
@@ -206,8 +208,7 @@ function App() {
               style={{ display: previousVisible ? "inline-block" : "none" }}
               onClick={() =>
                 isTypeView
-                  ? typePreviousUrl !== null &&
-                    getPokemonByType(type, offset - 12)
+                  ? getPokemonByType("", offset - 12)
                   : previousUrl !== null && getDataPokemons(previousUrl)
               }
             >
@@ -219,7 +220,7 @@ function App() {
               style={{ display: nextVisible ? "inline-block" : "none" }}
               onClick={() =>
                 isTypeView
-                  ? typeNextUrl !== null && getPokemonByType(type, offset + 12)
+                  ? getPokemonByType("", offset + 12)
                   : nextUrl !== null && getDataPokemons(nextUrl)
               }
             >

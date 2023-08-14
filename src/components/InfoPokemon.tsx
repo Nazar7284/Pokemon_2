@@ -2,6 +2,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { activeSlice } from "../store/reducers/ActivePokemon";
 import { PokemonActive } from "../models/models";
+import { firstLetterBig } from "../utils/utils";
 
 function ActivePokemon() {
   const { activePokemon } = useAppSelector((state) => state.ActiveReducer);
@@ -49,7 +50,7 @@ function ActivePokemon() {
             alt={activePokemon.name}
           />
           <h2>
-            {activePokemon.name} #
+            {firstLetterBig(activePokemon.name)} #
             {activePokemon?.id?.toString()?.padStart(3, "0")}{" "}
           </h2>
           <table>
