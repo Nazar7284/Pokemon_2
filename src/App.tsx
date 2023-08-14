@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "./hooks/redux";
 import { mainSlice } from "./store/reducers/MainSlice";
 import CardPokemon from "./components/CardPokemon";
 import { firstLetterBig } from "./utils/utils";
-import ActivePokemon from "./components/InfoPokemon";
+import InfoPokemon from "./components/InfoPokemon";
 import { Type } from "./models/models";
 
 function App() {
@@ -15,8 +15,6 @@ function App() {
   const [curPage, setCurPage] = useState(1);
 
   const {
-    previousUrl,
-    nextUrl,
     listPokemon,
     previousVisible,
     nextVisible,
@@ -26,8 +24,6 @@ function App() {
   } = useAppSelector((state) => state.MainReducer);
 
   const {
-    changePreviousUrl,
-    changeNextUrl,
     changeListPokemon,
     changeNextVisible,
     changePreviousVisible,
@@ -94,10 +90,6 @@ function App() {
         axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
       );
 
-      //Якщо немає силки, то цю кнопку не грузимо
-      dispatch(changeNextVisible(!!data.next));
-      dispatch(changePreviousVisible(!!data.previous));
-
       try {
         const responses = await Promise.all(requests);
         const pokemonData = responses.map((response) => response.data);
@@ -106,6 +98,9 @@ function App() {
         console.error("Error fetching pokemon data:", error);
         return [];
       }
+      //Якщо немає силки, то цю кнопку не грузимо
+      dispatch(changeNextVisible(!!data.next));
+      dispatch(changePreviousVisible(!!data.previous));
     }
     setIsLoading(false);
     setIsLoadingData(false);
@@ -124,13 +119,17 @@ function App() {
       }
       setCurPage(page);
     }
-    if (!isLoading) {
+
+    try {
       setIsLoading(true);
       setIsLoadingData(true);
       window.scroll(0, 0);
+
       dispatch(changeListPokemon([]));
       dispatch(changeOffset(offset));
+
       let currentUrl: string = "";
+
       if (value === "all") {
         getDataPokemons();
       } else {
@@ -145,59 +144,48 @@ function App() {
           console.log(currentUrlType);
           currentUrl = currentUrlType;
         }
-        const dataPokemonByType = await axios.get(currentUrl);
-        if (
-          dataPokemonByType.data.pokemon &&
-          dataPokemonByType.data.pokemon.length > 0
-        ) {
-          setAllAmountPage(
-            Math.ceil(dataPokemonByType.data.pokemon.length / 12)
-          );
 
-          let PokemonByType = dataPokemonByType.data.pokemon.slice(
-            offset,
-            offset + 12
-          );
+        const {
+          data: { pokemon: pokemons },
+        } = await axios.get(currentUrl);
 
-          let nextPageOffset = offset + 12;
-          let prevPageOffset = offset - 12;
+        if (pokemons && pokemons.length > 0) {
+          setAllAmountPage(Math.ceil(pokemons.length / 12));
 
-          if (page) {
-            PokemonByType = dataPokemonByType.data.pokemon.slice(
-              (page - 1) * 12,
-              (page - 1) * 12 + 12
-            );
-            nextPageOffset = (page - 1) * 12 + 12;
-            prevPageOffset = (page - 1) * 12 - 12;
-          }
+          const startIdx = page ? (page - 1) * 12 : offset;
+          const endIdx = startIdx + 12;
+          const PokemonByType = pokemons.slice(startIdx, endIdx);
 
-          const nextVisible =
-            nextPageOffset < dataPokemonByType.data.pokemon.length;
-          const previousVisible = prevPageOffset >= 0;
+          const nextPageOffset = endIdx;
+          const previousVisible = startIdx >= 12;
 
-          dispatch(changeNextVisible(nextVisible));
+          dispatch(changeNextVisible(nextPageOffset < pokemons.length));
           dispatch(changePreviousVisible(previousVisible));
 
           const requests = PokemonByType.map((pokemon: any) =>
             axios.get(pokemon.pokemon.url)
           );
-          try {
-            const responses = await Promise.all(requests);
-            const pokemonData = responses.map((response) => response.data);
-            dispatch(changeListPokemon(pokemonData));
-          } catch (error) {
-            console.error("Error fetching pokemon data:", error);
-            return [];
-          }
+
+          const responses = await Promise.all(requests);
+          const pokemonData = responses.map((response) => response.data);
+          dispatch(changeListPokemon(pokemonData));
         } else {
           // Немає покемонів
           console.log("No Pokemon data found.");
           dispatch(changeNextVisible(false));
           dispatch(changePreviousVisible(false));
         }
-        setIsLoading(false);
+
         setIsLoadingData(false);
       }
+    } catch (error) {
+      console.error("Error fetching pokemon data:", error);
+      setIsLoading(false);
+      setIsLoadingData(false);
+      return [];
+    } finally {
+      setIsLoading(false);
+      setIsLoadingData(false);
     }
   };
 
@@ -260,8 +248,7 @@ function App() {
           <div className="button-section">
             <button
               className="btn-previous"
-              disabled={isLoading}
-              style={{ display: previousVisible ? "inline-block" : "none" }}
+              disabled={isLoading || !previousVisible} // Змінено тут
               onClick={() => handlePageChange(curPage - 1)}
             >
               Previous
@@ -291,17 +278,14 @@ function App() {
             </div>
             <button
               className="btn-next"
-              disabled={isLoading}
-              style={{ display: nextVisible ? "inline-block" : "none" }}
+              disabled={isLoading || !nextVisible}
               onClick={() => handlePageChange(curPage + 1)}
             >
               Next
             </button>
           </div>
         </div>
-        <div className="infoPokemon">
-          <ActivePokemon />
-        </div>
+        <InfoPokemon />
       </div>
     </div>
   );

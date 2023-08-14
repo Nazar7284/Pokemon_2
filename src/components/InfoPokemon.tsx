@@ -4,7 +4,7 @@ import { activeSlice } from "../store/reducers/ActivePokemonSlice";
 import { PokemonActive } from "../models/models";
 import { firstLetterBig } from "../utils/utils";
 
-function ActivePokemon() {
+function InfoPokemon() {
   const { activePokemon } = useAppSelector((state) => state.ActiveReducer);
   const { defaultImage } = useAppSelector((state) => state.MainReducer);
   const { changeActivePokemon } = activeSlice.actions;
@@ -37,7 +37,7 @@ function ActivePokemon() {
   };
 
   return (
-    <div>
+    <div className="infoPokemon">
       {activePokemon.name ? (
         <div className="details" onClick={handleEmptyActivePokemon}>
           <img
@@ -102,4 +102,4 @@ function ActivePokemon() {
     </div>
   );
 }
-export default ActivePokemon;
+export default InfoPokemon;

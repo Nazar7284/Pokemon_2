@@ -20,6 +20,19 @@ export interface PokemonActive {
   }[];
 }
 
+export interface interfacelistPokemon {
+  name: string;
+  id: number;
+  sprites: {
+    other: {
+      dream_world: {
+        front_default: string;
+      };
+    };
+  };
+  types: {};
+}
+
 export interface Pokemon {
   activePokemon: PokemonActive;
 }

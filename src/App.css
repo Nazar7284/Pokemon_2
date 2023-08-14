@@ -13,7 +13,6 @@
   border: 0.125rem solid black;
   margin: 2rem 30rem 0;
 }
-
 .typeSelect {
   font-size: 1.25rem;
   margin-top: 1rem;
@@ -194,18 +193,28 @@
   width: 100%;
 }
 .button-section button {
+  padding: 0.5rem 1rem;
   font-size: 1.5rem;
-  background: transparent;
-  padding: 0.625rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem;
   cursor: pointer;
-  border: 5px outset black;
   transition: all 0.2s ease-in-out;
   -webkit-transition: all 0.2s ease-in-out;
   -moz-transition: all 0.2s ease-in-out;
   -ms-transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
+  -webkit-border-radius: 0.25rem;
+  -moz-border-radius: 0.25rem;
+  -ms-border-radius: 0.25rem;
+  -o-border-radius: 0.25rem;
 }
-
+.btn-next[disabled],
+.btn-previous[disabled] {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
 .button-section button:hover {
   transform: scale(1.1);
   -webkit-transform: scale(1.1);
@@ -213,13 +222,11 @@
   -ms-transform: scale(1.1);
   -o-transform: scale(1.1);
 }
-
 .page {
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
-
 .page div {
   cursor: pointer;
   width: 2.5rem;
@@ -237,7 +244,6 @@
   -ms-transition: all 0.2s ease-in-out;
   -o-transition: all 0.2s ease-in-out;
 }
-
 .page div:hover {
   transform: translateY(-10px);
   -webkit-transform: translateY(-10px);
@@ -379,6 +385,13 @@ td {
 }
 
 @media (max-width: 500px) {
+  .card-pokemon {
+    width: 7rem;
+    padding: 0.5rem;
+  }
+  .pokemon-types {
+    font-size: 13px;
+  }
   .button-section button {
     font-size: 1rem;
     padding: 0.3125rem;
@@ -391,5 +404,8 @@ td {
   }
   .details {
     width: 10rem;
+  }
+  .infoPokemon h1 {
+    font-size: 16px;
   }
 }

@@ -1,9 +1,8 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { interfacelistPokemon } from "../../models/models";
 
 interface MainSlice {
-  nextUrl: string | null;
-  previousUrl: string | null;
-  listPokemon: any;
+  listPokemon: interfacelistPokemon[];
   previousVisible: boolean;
   nextVisible: boolean;
   defaultImage: string;
@@ -13,8 +12,6 @@ interface MainSlice {
 }
 
 const initialState: MainSlice = {
-  nextUrl: "",
-  previousUrl: "",
   listPokemon: [],
   previousVisible: true,
   nextVisible: true,
@@ -31,12 +28,6 @@ export const mainSlice = createSlice({
   reducers: {
     changeListPokemon(state, action: PayloadAction<any>) {
       state.listPokemon = action.payload;
-    },
-    changeNextUrl(state, action: PayloadAction<string>) {
-      state.nextUrl = action.payload;
-    },
-    changePreviousUrl(state, action: PayloadAction<string>) {
-      state.previousUrl = action.payload;
     },
     changeNextVisible(state, action: PayloadAction<boolean>) {
       state.nextVisible = action.payload;
