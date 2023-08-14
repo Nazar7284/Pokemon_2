@@ -190,6 +190,7 @@
   margin-top: 1rem;
   display: flex;
   justify-content: space-around;
+  flex-wrap: wrap;
   width: 100%;
 }
 .button-section button {
@@ -226,6 +227,8 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .page div {
   cursor: pointer;
@@ -251,11 +254,10 @@
   -ms-transform: translateY(-10px);
   -o-transform: translateY(-10px);
 }
-
 .infoPokemon {
   position: fixed;
-  top: 50%;
-  left: 75%; /* Змініть відповідно до потреб */
+  top: 45%;
+  left: 75%;
   transform: translate(-50%, -50%);
   display: flex;
   justify-content: center;
@@ -263,7 +265,6 @@
   width: 50%;
   padding: 10px;
 }
-
 .details {
   display: flex;
   justify-content: center;
@@ -276,27 +277,34 @@
   margin-top: 6.25em;
   cursor: pointer;
 }
-
 .details img {
   width: 12.5rem;
   height: 12.5rem;
   object-fit: contain;
 }
-
 .details h2 {
   margin: 0.5em 0;
 }
-
 table {
   border-collapse: collapse;
   width: 100%;
 }
-
 th,
 td {
   border: 0.05em solid black;
   padding: 0.5em;
   text-align: center;
+}
+
+@media (max-width: 1400px) {
+  .button-section {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .button-section button {
+    width: 16rem;
+  }
 }
 
 @media (max-width: 1200px) {
@@ -305,23 +313,23 @@ td {
     border: 0.125rem solid black;
     margin: 2rem 15rem 0;
   }
+  .infoPokemon {
+    top: 40%;
+  }
   .details {
     width: 20em;
     top: 10%;
     right: 13%;
     margin-top: 6.25em;
   }
-
   .details img {
     width: 8em;
     height: 8em;
   }
-
   .details h2 {
     margin: 0.5em 0;
     font-size: 1.5em;
   }
-
   th,
   td {
     font-size: 0.9em;
@@ -360,6 +368,13 @@ td {
     font-size: 1.5rem;
     padding: 0.3125rem;
   }
+  .page {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
   .infoPokemon h1 {
     font-size: 24px;
   }
@@ -392,15 +407,30 @@ td {
   .pokemon-types {
     font-size: 13px;
   }
+  .button-section {
+    margin-top: 1rem;
+    display: flex;
+    width: 100%;
+  }
+  .page {
+    margin: 1rem 0;
+  }
+  .page div {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    margin-right: 1rem;
+  }
   .button-section button {
     font-size: 1rem;
     padding: 0.3125rem;
+    width: 10rem;
   }
   .infoPokemon {
-    position: fixed;
-    top: 50%;
-    left: 72%;
-    padding: 0;
+    top: 35%;
   }
   .details {
     width: 10rem;

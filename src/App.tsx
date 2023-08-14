@@ -241,7 +241,7 @@ function App() {
               display: previousVisible || nextVisible ? "block" : "none",
             }}
           >
-            Поточна сторінка {curPage}
+            Current page {curPage}
           </div>
           <div className="button-section">
             <button
