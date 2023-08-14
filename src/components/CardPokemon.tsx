@@ -2,25 +2,14 @@ import React from "react";
 import { firstLetterBig } from "../utils/utils";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { activeSlice } from "../store/reducers/ActivePokemon";
-
-interface Type {
-  type: {
-    name: string;
-    url: string;
-  };
-}
-
-interface CardPokemonProps {
-  name: string;
-  types: Type[];
-  photo: string;
-}
+import { activeSlice } from "../store/reducers/ActivePokemonSlice";
+import { CardPokemonProps } from "../models/models";
 
 function CardPokemon({ name, types, photo }: CardPokemonProps) {
   const dispatch = useAppDispatch();
   const { changeActivePokemon } = activeSlice.actions;
   const { defaultImage } = useAppSelector((state) => state.MainReducer);
+
   const typeElements = types.map((typeObj, index) => (
     <div className={typeObj.type.name.toLowerCase()} key={index}>
       {firstLetterBig(typeObj.type.name)}
@@ -33,14 +22,15 @@ function CardPokemon({ name, types, photo }: CardPokemonProps) {
     );
     dispatch(changeActivePokemon(data));
   };
+
   return (
     <div
       className="card-pokemon"
       key={name}
       onClick={() => ActivePokemon(name)}
     >
-      <div>
-        <img src={photo === null ? defaultImage : photo} alt={name} />
+      <div className="pokemon-details">
+        <img src={photo ? photo : defaultImage} alt={name} />
         <h2>{firstLetterBig(name)}</h2>
       </div>
       <div className="pokemon-types">{typeElements}</div>

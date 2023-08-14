@@ -1,6 +1,6 @@
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { activeSlice } from "../store/reducers/ActivePokemon";
+import { activeSlice } from "../store/reducers/ActivePokemonSlice";
 import { PokemonActive } from "../models/models";
 import { firstLetterBig } from "../utils/utils";
 

@@ -28,3 +28,16 @@ export interface Type {
   name: string;
   url: string;
 }
+
+export interface Type {
+  type: {
+    name: string;
+    url: string;
+  };
+}
+
+export interface CardPokemonProps {
+  name: string;
+  types: Type[];
+  photo: string;
+}

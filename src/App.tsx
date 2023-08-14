@@ -11,6 +11,8 @@ import { Type } from "./models/models";
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(false);
+  const [allAmountPage, setAllAmountPage] = useState(999);
+  const [curPage, setCurPage] = useState(1);
 
   const {
     previousUrl,
@@ -38,55 +40,64 @@ function App() {
 
   const getTypePokemon = async () => {
     try {
-      const dataType = await axios.get<{ results: Type[] }>(
+      const response = await axios.get<{ results: Type[] }>(
         "https://pokeapi.co/api/v2/type"
       );
-      const types: Type[] = dataType.data.results;
-      const typeNames: string[] = types.map((type) => {
-        return firstLetterBig(type.name);
-      }); // назви типів
-      const selectElem = document.querySelector(".typeSelect") as HTMLElement;
+      const types: Type[] = response.data.results;
+      const typeNames: string[] = types.map((type) =>
+        firstLetterBig(type.name)
+      );
+
+      const selectElem = document.querySelector(
+        ".typeSelect"
+      ) as HTMLSelectElement;
       typeNames.forEach((typeName, index) => {
         const option = new Option(typeName, types[index].url);
         selectElem.appendChild(option);
       });
     } catch (error) {
-      console.error("Дані не отримані, існує помилка:", error);
+      console.error("Не вдалося отримати дані про типи покемонів:", error);
     }
   };
 
-  const getDataPokemons = async (url?: string) => {
+  const getDataPokemons = async (page?: number) => {
+    if (page) {
+      if (curPage === page) {
+        alert(`Ви вже знаходитеся на сторінці ${page}`);
+        return;
+      }
+      setCurPage(page);
+    } else {
+      setCurPage(1);
+    }
     dispatch(changeIsTypeView(false));
     if (!isLoading) {
-      setIsLoading(true);
-      setIsLoadingData(true);
+      setIsLoadingData(true); //дані завантажуються
+      setIsLoading(true); // дісейбл кнопок
+      dispatch(changeListPokemon([])); // щоб крутився лоудер ініц пустий масив
       window.scroll(0, 0);
+
       const defaultUrl = "https://pokeapi.co/api/v2/pokemon/?limit=12";
-      const inputString =
-        typeof url === "string" && url.trim() !== "" ? url : defaultUrl;
 
-      const dataPokemon = await axios.get(inputString);
-
-      dispatch(changeNextUrl(dataPokemon.data.next));
-      dispatch(changePreviousUrl(dataPokemon.data.previous));
-
-      if (!dataPokemon.data.next) {
-        dispatch(changeNextVisible(false));
-      } else {
-        dispatch(changeNextVisible(true));
-      }
-      if (!dataPokemon.data.previous) {
-        dispatch(changePreviousVisible(false));
-      } else {
-        dispatch(changePreviousVisible(true));
+      let curUrl = defaultUrl;
+      if (page) {
+        const offset = (page - 1) * 12;
+        console.log(offset);
+        curUrl = `${defaultUrl}&offset=${offset}`;
       }
 
-      const Pokemons = dataPokemon.data.results;
+      const { data } = await axios.get(curUrl);
 
-      const requests = Pokemons.map((pokemon: any) =>
+      setAllAmountPage(Math.ceil(data.count / 12)); // к-сть сторінок
+
+      const requests = data.results.map((pokemon: any) =>
         axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
       );
-      dispatch(changeListPokemon([]));
+
+      //Якщо немає силки, то цю кнопку не грузимо
+      dispatch(changeNextVisible(!!data.next));
+      dispatch(changePreviousVisible(!!data.previous));
+
       try {
         const responses = await Promise.all(requests);
         const pokemonData = responses.map((response) => response.data);
@@ -96,19 +107,29 @@ function App() {
         return [];
       }
     }
-    setIsLoadingData(false);
     setIsLoading(false);
+    setIsLoadingData(false);
   };
 
-  const getPokemonByType = async (value?: string, offset: number = 0) => {
+  const getPokemonByType = async (
+    value?: string,
+    offset: number = 0,
+    page?: number
+  ) => {
     console.log("type");
+    if (page) {
+      if (curPage === page) {
+        alert(`Ви вже знаходитеся на сторінці ${page}`);
+        return;
+      }
+      setCurPage(page);
+    }
     if (!isLoading) {
       setIsLoading(true);
       setIsLoadingData(true);
       window.scroll(0, 0);
       dispatch(changeListPokemon([]));
       dispatch(changeOffset(offset));
-
       let currentUrl: string = "";
       if (value === "all") {
         getDataPokemons();
@@ -117,9 +138,11 @@ function App() {
           console.log("перший пошук за типом");
           dispatch(changeIsTypeView(true));
           dispatch(changeCurrentUrlType(value));
+          setCurPage(1);
           currentUrl = value;
         } else if (currentUrlType !== "") {
           console.log("взяли з redux url");
+          console.log(currentUrlType);
           currentUrl = currentUrlType;
         }
         const dataPokemonByType = await axios.get(currentUrl);
@@ -127,10 +150,33 @@ function App() {
           dataPokemonByType.data.pokemon &&
           dataPokemonByType.data.pokemon.length > 0
         ) {
-          const PokemonByType = dataPokemonByType.data.pokemon.slice(
+          setAllAmountPage(
+            Math.ceil(dataPokemonByType.data.pokemon.length / 12)
+          );
+
+          let PokemonByType = dataPokemonByType.data.pokemon.slice(
             offset,
             offset + 12
           );
+
+          let nextPageOffset = offset + 12;
+          let prevPageOffset = offset - 12;
+
+          if (page) {
+            PokemonByType = dataPokemonByType.data.pokemon.slice(
+              (page - 1) * 12,
+              (page - 1) * 12 + 12
+            );
+            nextPageOffset = (page - 1) * 12 + 12;
+            prevPageOffset = (page - 1) * 12 - 12;
+          }
+
+          const nextVisible =
+            nextPageOffset < dataPokemonByType.data.pokemon.length;
+          const previousVisible = prevPageOffset >= 0;
+
+          dispatch(changeNextVisible(nextVisible));
+          dispatch(changePreviousVisible(previousVisible));
 
           const requests = PokemonByType.map((pokemon: any) =>
             axios.get(pokemon.pokemon.url)
@@ -139,17 +185,6 @@ function App() {
             const responses = await Promise.all(requests);
             const pokemonData = responses.map((response) => response.data);
             dispatch(changeListPokemon(pokemonData));
-
-            if (offset + 12 >= dataPokemonByType.data.pokemon.length) {
-              dispatch(changeNextVisible(false));
-            } else {
-              dispatch(changeNextVisible(true));
-            }
-            if (offset - 12 < 0) {
-              dispatch(changePreviousVisible(false));
-            } else {
-              dispatch(changePreviousVisible(true));
-            }
           } catch (error) {
             console.error("Error fetching pokemon data:", error);
             return [];
@@ -160,6 +195,7 @@ function App() {
           dispatch(changeNextVisible(false));
           dispatch(changePreviousVisible(false));
         }
+        setIsLoading(false);
         setIsLoadingData(false);
       }
     }
@@ -171,10 +207,10 @@ function App() {
     } else {
       getDataPokemons(pageNumber);
     }
-    }
   };
 
   useEffect(() => {
+    console.log("render");
     getTypePokemon();
     getDataPokemons();
   }, []);
@@ -192,45 +228,72 @@ function App() {
         </select>
       </div>
       <div className="main">
-        <div className="listPokemon">
-          {listPokemon.length ? (
-            listPokemon.map((pokemon: any) => {
-              return (
-                <CardPokemon
-                  name={pokemon.name}
-                  photo={pokemon.sprites.other.dream_world.front_default}
-                  types={pokemon.types}
-                  key={pokemon.id}
-                />
-              );
-            })
-          ) : isLoadingData ? (
+        <div className="all-pokemon">
+          {isLoadingData ? (
             <div className="lds-dual-ring"></div>
           ) : (
-            <h1>No Pokemon data found.</h1>
+            <div className="listPokemon">
+              {listPokemon.length ? (
+                listPokemon.map((pokemon: any) => {
+                  return (
+                    <CardPokemon
+                      name={pokemon.name}
+                      photo={pokemon.sprites.other.dream_world.front_default}
+                      types={pokemon.types}
+                      key={pokemon.id}
+                    />
+                  );
+                })
+              ) : (
+                <h1>No Pokemon data found.</h1>
+              )}
+            </div>
           )}
+          <div
+            className="curpage"
+            style={{
+              display: previousVisible || nextVisible ? "block" : "none",
+            }}
+          >
+            Поточна сторінка {curPage}
+          </div>
           <div className="button-section">
             <button
               className="btn-previous"
               disabled={isLoading}
               style={{ display: previousVisible ? "inline-block" : "none" }}
-              onClick={() =>
-                isTypeView
-                  ? getPokemonByType("", offset - 12)
-                  : previousUrl !== null && getDataPokemons(previousUrl)
-              }
+              onClick={() => handlePageChange(curPage - 1)}
             >
               Previous
             </button>
+            <div
+              className="page"
+              style={{
+                display: previousVisible || nextVisible ? "flex" : "none",
+              }}
+            >
+              {[
+                curPage - 2,
+                curPage - 1,
+                curPage,
+                curPage + 1,
+                curPage + 2,
+              ].map((pageNumber) =>
+                pageNumber > 0 && pageNumber <= allAmountPage ? (
+                  <div
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                  >
+                    {pageNumber}
+                  </div>
+                ) : null
+              )}
+            </div>
             <button
               className="btn-next"
               disabled={isLoading}
               style={{ display: nextVisible ? "inline-block" : "none" }}
-              onClick={() =>
-                isTypeView
-                  ? getPokemonByType("", offset + 12)
-                  : nextUrl !== null && getDataPokemons(nextUrl)
-              }
+              onClick={() => handlePageChange(curPage + 1)}
             >
               Next
             </button>

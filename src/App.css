@@ -1,3 +1,9 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .footer {
   text-align: center;
 }
@@ -14,27 +20,23 @@
   border: 0.3125rem outset black;
   cursor: pointer;
 }
-
 .main {
   display: flex;
   margin: 2rem 10%;
 }
-
-.listPokemon {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+.all-pokemon {
   width: 50%;
-  gap: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
-
 .lds-dual-ring {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100px;
   height: 100px;
-  position: relative;
 }
 
 .lds-dual-ring:after {
@@ -56,15 +58,24 @@
     transform: rotate(360deg);
   }
 }
+.listPokemon {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.listPokemon h1 {
+  margin: 1rem 0;
+}
+.curpage {
+  font-size: 24px;
+}
 
 .card-pokemon {
   width: 13rem;
   border: 1px solid black;
   padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-direction: column;
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   -webkit-transition: all 0.3s ease-in-out;
@@ -81,6 +92,12 @@
   -o-transform: scale(1.1);
 }
 
+.pokemon-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .card-pokemon img {
   width: 10rem;
   height: 10rem;
@@ -88,8 +105,8 @@
 
 .pokemon-types {
   display: flex;
+  justify-content: start;
   font-size: 20px;
-  text-align: start;
 }
 
 .pokemon-types div {
@@ -165,13 +182,17 @@
   background-color: rgb(105, 105, 105);
 }
 
+.curpage {
+  font-size: 24px;
+  margin-top: 2rem;
+}
+
 .button-section {
+  margin-top: 1rem;
   display: flex;
   justify-content: space-around;
   width: 100%;
-  flex-wrap: wrap;
 }
-
 .button-section button {
   font-size: 1.5rem;
   background: transparent;
@@ -191,6 +212,38 @@
   -moz-transform: scale(1.1);
   -ms-transform: scale(1.1);
   -o-transform: scale(1.1);
+}
+
+.page {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.page div {
+  cursor: pointer;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid black;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  margin-right: 1rem;
+  transition: all 0.2s ease-in-out;
+  -webkit-transition: all 0.2s ease-in-out;
+  -moz-transition: all 0.2s ease-in-out;
+  -ms-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+}
+
+.page div:hover {
+  transform: translateY(-10px);
+  -webkit-transform: translateY(-10px);
+  -moz-transform: translateY(-10px);
+  -ms-transform: translateY(-10px);
+  -o-transform: translateY(-10px);
 }
 
 .infoPokemon {
