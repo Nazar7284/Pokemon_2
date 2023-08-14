@@ -161,8 +161,16 @@ function App() {
           dispatch(changePreviousVisible(false));
         }
         setIsLoadingData(false);
-        setIsLoading(false);
       }
+    }
+  };
+
+  const handlePageChange = (pageNumber: number) => {
+    if (isTypeView) {
+      getPokemonByType("", offset + 12, pageNumber);
+    } else {
+      getDataPokemons(pageNumber);
+    }
     }
   };
 
