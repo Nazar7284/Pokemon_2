@@ -6,7 +6,7 @@ import { mainSlice } from "./store/reducers/MainSlice";
 import CardPokemon from "./components/CardPokemon";
 import { firstLetterBig } from "./utils/utils";
 import InfoPokemon from "./components/InfoPokemon";
-import { Type } from "./models/models";
+import { Types } from "./models/models";
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,8 +27,8 @@ function App() {
     changeListPokemon,
     changeNextVisible,
     changePreviousVisible,
-    changeIsTypeView,
     changeOffset,
+    changeIsTypeView,
     changeCurrentUrlType,
   } = mainSlice.actions;
 
@@ -36,10 +36,10 @@ function App() {
 
   const getTypePokemon = async () => {
     try {
-      const response = await axios.get<{ results: Type[] }>(
+      const response = await axios.get<{ results: Types[] }>(
         "https://pokeapi.co/api/v2/type"
       );
-      const types: Type[] = response.data.results;
+      const types: Types[] = response.data.results;
       const typeNames: string[] = types.map((type) =>
         firstLetterBig(type.name)
       );
@@ -89,7 +89,6 @@ function App() {
       const requests = data.results.map((pokemon: any) =>
         axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`)
       );
-
       try {
         const responses = await Promise.all(requests);
         const pokemonData = responses.map((response) => response.data);
@@ -175,7 +174,6 @@ function App() {
           dispatch(changeNextVisible(false));
           dispatch(changePreviousVisible(false));
         }
-
         setIsLoadingData(false);
       }
     } catch (error) {

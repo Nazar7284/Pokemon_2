@@ -1,8 +1,8 @@
 import React from "react";
-import { firstLetterBig } from "../utils/utils";
 import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { activeSlice } from "../store/reducers/ActivePokemonSlice";
+import { firstLetterBig } from "../utils/utils";
 import { CardPokemonProps } from "../models/models";
 
 function CardPokemon({ name, types, photo }: CardPokemonProps) {
@@ -10,30 +10,30 @@ function CardPokemon({ name, types, photo }: CardPokemonProps) {
   const { changeActivePokemon } = activeSlice.actions;
   const { defaultImage } = useAppSelector((state) => state.MainReducer);
 
-  const typeElements = types.map((typeObj, index) => (
-    <div className={typeObj.type.name.toLowerCase()} key={index}>
-      {firstLetterBig(typeObj.type.name)}
-    </div>
-  ));
-
-  const ActivePokemon = async (name: string) => {
-    const { data } = await axios.get(
-      `https://pokeapi.co/api/v2/pokemon/${name}`
-    );
-    dispatch(changeActivePokemon(data));
+  const fetchActivePokemon = async (pokemonName: string) => {
+    try {
+      const { data } = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
+      );
+      dispatch(changeActivePokemon(data));
+    } catch (error) {
+      console.error("Помилка при отриманні активного Покемона:", error);
+    }
   };
 
   return (
-    <div
-      className="card-pokemon"
-      key={name}
-      onClick={() => ActivePokemon(name)}
-    >
+    <div className="card-pokemon" onClick={() => fetchActivePokemon(name)}>
       <div className="pokemon-details">
-        <img src={photo ? photo : defaultImage} alt={name} />
+        <img src={photo || defaultImage} alt={name} />
         <h2>{firstLetterBig(name)}</h2>
       </div>
-      <div className="pokemon-types">{typeElements}</div>
+      <div className="pokemon-types">
+        {types.map((typeObj, index) => (
+          <div className={typeObj.type.name.toLowerCase()} key={index}>
+            {firstLetterBig(typeObj.type.name)}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

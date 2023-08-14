@@ -1,45 +1,29 @@
+export interface Sprite {
+  other: {
+    dream_world: {
+      front_default: string;
+    };
+  };
+}
+
+export interface Stat {
+  base_stat: number;
+}
+
+export interface Move {
+  move: {
+    name: string;
+    url: string;
+  };
+}
+
 export interface PokemonActive {
   name: string;
   id: number;
-  sprites: {
-    other: {
-      dream_world: {
-        front_default: string;
-      };
-    };
-  };
-  stats: {
-    base_stat: number;
-  }[];
+  sprites: Sprite;
+  stats: Stat[];
   weight: number;
-  moves: {
-    move: {
-      name: string;
-      url: string;
-    };
-  }[];
-}
-
-export interface interfacelistPokemon {
-  name: string;
-  id: number;
-  sprites: {
-    other: {
-      dream_world: {
-        front_default: string;
-      };
-    };
-  };
-  types: {};
-}
-
-export interface Pokemon {
-  activePokemon: PokemonActive;
-}
-
-export interface Type {
-  name: string;
-  url: string;
+  moves: Move[];
 }
 
 export interface Type {
@@ -49,8 +33,36 @@ export interface Type {
   };
 }
 
+export interface Types {
+  name: string;
+  url: string;
+}
+
+export interface ListPokemon {
+  name: string;
+  id: number;
+  sprites: Sprite;
+  types: Type[];
+}
+
+export interface Pokemon {
+  activePokemon: PokemonActive;
+}
+
 export interface CardPokemonProps {
   name: string;
   types: Type[];
   photo: string;
+}
+
+export interface MainSlice {
+  nextUrl: string | null;
+  previousUrl: string | null;
+  listPokemon: any;
+  previousVisible: boolean;
+  nextVisible: boolean;
+  defaultImage: string;
+  isTypeView: boolean;
+  offset: number;
+  currentUrlType: string;
 }

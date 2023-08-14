@@ -61,38 +61,27 @@ function InfoPokemon() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Attack</td>
-                <td>{activePokemon?.stats?.[1]?.base_stat}</td>
-              </tr>
-              <tr>
-                <td>Defense</td>
-                <td>{activePokemon?.stats?.[2]?.base_stat}</td>
-              </tr>
-              <tr>
-                <td>HP</td>
-                <td>{activePokemon?.stats?.[1]?.base_stat}</td>
-              </tr>
-              <tr>
-                <td>SP Attack</td>
-                <td>{activePokemon?.stats?.[3]?.base_stat}</td>
-              </tr>
-              <tr>
-                <td>SP Defense</td>
-                <td>{activePokemon?.stats?.[4]?.base_stat}</td>
-              </tr>
-              <tr>
-                <td>Speed</td>
-                <td>{activePokemon?.stats?.[5]?.base_stat}</td>
-              </tr>
-              <tr>
-                <td>Weight</td>
-                <td>{activePokemon?.weight}</td>
-              </tr>
-              <tr>
-                <td>Total moves</td>
-                <td>{activePokemon?.moves?.length}</td>
-              </tr>
+              {[
+                { name: "Attack", stat: activePokemon?.stats?.[1]?.base_stat },
+                { name: "Defense", stat: activePokemon?.stats?.[2]?.base_stat },
+                { name: "HP", stat: activePokemon?.stats?.[0]?.base_stat },
+                {
+                  name: "SP Attack",
+                  stat: activePokemon?.stats?.[3]?.base_stat,
+                },
+                {
+                  name: "SP Defense",
+                  stat: activePokemon?.stats?.[4]?.base_stat,
+                },
+                { name: "Speed", stat: activePokemon?.stats?.[5]?.base_stat },
+                { name: "Weight", stat: activePokemon?.weight },
+                { name: "Total moves", stat: activePokemon?.moves?.length },
+              ].map((item, index) => (
+                <tr key={index}>
+                  <td>{item.name}</td>
+                  <td>{item.stat}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
